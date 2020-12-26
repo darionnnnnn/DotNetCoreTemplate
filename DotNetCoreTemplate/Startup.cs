@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +7,10 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using DotNetCoreTemplate.Middleware;
+using Microsoft.AspNetCore.Http;
 
 namespace DotNetCoreTemplate
 {
@@ -15,20 +18,94 @@ namespace DotNetCoreTemplate
     {
         public Startup(IConfiguration configuration)
         {
+            Program.Output("[Startup] Constructor - Called");
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
+        // Host 建置時 WebHost 會呼叫 UseStartup 泛型類別的 ConfigureServices 方法
         // This method gets called by the runtime. Use this method to add services to the container.
+        // 在此將服務註冊到 DI 容器用，可不實做
         public void ConfigureServices(IServiceCollection services)
         {
+            Program.Output("[Startup] WebHost ConfigureServices - Called");
             services.AddControllersWithViews();
         }
 
+        // Host 啟動後 WebHost 會呼叫 UseStartup 泛型類別的 Configure 方法
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
         {
+            #region ApplicationLifetime
+            appLifetime.ApplicationStarted
+                       .Register(() =>
+                                 {
+                                     Program.Output("[Startup] ApplicationLifetime - Started");
+                                 });
+
+            appLifetime.ApplicationStopping
+                       .Register(() =>
+                                 {
+                                     Program.Output("[Startup] ApplicationLifetime - Stopping");
+                                 });
+
+            appLifetime.ApplicationStopped
+                       .Register(() =>
+                                 {
+                                     Thread.Sleep(5 * 1000);
+                                     Program.Output("[Startup] ApplicationLifetime - Stopped");
+                                 });
+            #endregion
+
+            #region Middleware
+            // 全域註冊外部 Middleware，亦可在 Controlle 上加 Attribute 做局部註冊
+            // 註冊 FirstMiddleware
+            // app.UseMiddleware<FirstMiddleware>();
+
+            // 註冊 SecondMiddleware
+            // app.UseMiddleware<SecondMiddleware>();
+
+            // 註冊靜態的擴充 Middleware
+            // app.UseFirstMiddleware();
+
+            // 實務上會將 Middleware 分開放以便維護
+            // app.Use(async (context, next) =>
+            //         {
+            //             await context.Response.WriteAsync("First Middleware in. \r\n");
+            //             await next.Invoke();
+            //             await context.Response.WriteAsync("First Middleware out. \r\n");
+            //         });
+            //
+            // // 作為路由，依據 URL (/second) 決定是否
+            // app.Map("/second", mapApp =>
+            //                    {
+            //                        mapApp.Use(async (context, next) =>
+            //                                   {
+            //                                       await context.Response.WriteAsync("Second Middleware in. \r\n");
+            //                                       await next.Invoke();
+            //                                       await context.Response.WriteAsync("Second Middleware out. \r\n");
+            //                                   });
+            //                        mapApp.Run(async context =>
+            //                                   {
+            //                                       await context.Response.WriteAsync("Second. \r\n");
+            //                                   });
+            //                    });
+            // app.Use(async (context, next) =>
+            //         {
+            //             await context.Response.WriteAsync("Third Middleware in. \r\n");
+            //             await next.Invoke();
+            //             await context.Response.WriteAsync("Third Middleware out. \r\n");
+            //         });
+            //
+
+            // Run 是 Middleware 的最後一個行為
+            // app.Run(async context =>
+            //         {
+            //             await context.Response.WriteAsync("Hello World! \r\n");
+            //         });
+            #endregion
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -52,6 +129,19 @@ namespace DotNetCoreTemplate
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+
+
+            // For trigger stop WebHost
+            // var thread = new Thread(() =>
+            //                         {
+            //                             Thread.Sleep(5 * 1000);
+            //                             Program.Output("[Startup] Trigger stop WebHost");
+            //                             appLifetime.StopApplication();
+            //                         });
+            // thread.Start();
+
+            Program.Output("[Startup] Configure - Called");
         }
     }
 }

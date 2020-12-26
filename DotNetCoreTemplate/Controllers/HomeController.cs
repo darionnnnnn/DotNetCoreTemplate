@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using DotNetCoreTemplate.Middleware;
 
 namespace DotNetCoreTemplate.Controllers
 {
+    // 局部註冊 Middleware
+    // [MiddlewareFilter(typeof(FirstMiddleware))]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -18,6 +21,8 @@ namespace DotNetCoreTemplate.Controllers
             _logger = logger;
         }
 
+        // 局部註冊 Middleware
+        // [MiddlewareFilter(typeof(FirstMiddleware))]
         public IActionResult Index()
         {
             return View();
