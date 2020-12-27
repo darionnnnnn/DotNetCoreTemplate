@@ -22,6 +22,11 @@ namespace DotNetCoreTemplate
 
             #region 在 Main 中取得 DI 註冊的 Service
 
+            // HostBuilder 建置出 Host 的實例之前，要透過 ConfigureServices 先宣告 DI Services
+            // HostBuilder 建置出 Host 實例時會依照 ConfigureServices 註冊的配置告知 Service Provider
+            // 讓 Service Provider 可以提供請求者 Services
+            // 而 Service Provider 的實例會一直存在 Host 的實例中
+
             // Singleton & Transient 可直接透過 Service Provider 取出
             var singleton = host.Services.GetService<ISampleSingleton>();
             var transient = host.Services.GetService<ISampleTransient>();

@@ -42,6 +42,18 @@ namespace DotNetCoreTemplate
             services.AddScoped<ISampleScoped, SampleService>();
             services.AddSingleton<ISampleSingleton, SampleService>();
 
+            #region 在 Host 實例產生前取得 Service Provider
+
+            // 在 Host 實例產生後即可透過 Constructor 注入取得 Service
+            // 在 Host 實例產生前，則可透過 IServiceCollection 取得
+            // // 建置 Service Provider (與 Host 中的 Service Provider 是不同實體，各自擁有各自的 Singleton)
+            // var serviceProvider = services.BuildServiceProvider();
+            //
+            // // 從 Service Provider 取得服務使用
+            // var sample = serviceProvider.GetService<ISampleSingleton>();
+
+            #endregion
+
             // Singleton 也可以用以下方法註冊
             // services.AddSingleton<ISampleSingleton>(new SampleService());
 
