@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using DotNetCoreTemplate.Service;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCoreTemplate
 {
@@ -37,6 +39,9 @@ namespace DotNetCoreTemplate
             {
                 // Generic Host 註冊 Services
                 Output("[Program] hostBuilder.ConfigureServices - Called");
+
+                // 在 Generic Host Builder 註冊 DI
+                // services.AddScoped<ISampleService, SampleService>();
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {
@@ -44,6 +49,10 @@ namespace DotNetCoreTemplate
                                              {
                                                  // Web Host 註冊 Services
                                                  Output("[Program] webBuilder.ConfigureServices - Called");
+
+
+                                                 // 在 Web Host Builder 註冊 DI
+                                                 // services.AddScoped<ISampleService, SampleService>();
                                              })
                           .Configure(app =>
                                      {

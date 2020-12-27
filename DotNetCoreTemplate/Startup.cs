@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetCoreTemplate.Middleware;
+using DotNetCoreTemplate.Service;
 using Microsoft.AspNetCore.Http;
 
 namespace DotNetCoreTemplate
@@ -31,6 +32,29 @@ namespace DotNetCoreTemplate
         {
             Program.Output("[Startup] WebHost ConfigureServices - Called");
             services.AddControllersWithViews();
+
+            #region DI (Dependency Injection) 
+
+            // services 就是一個 DI 容器，把 MVC 的服務註冊到 DI 容器，需要用 MVC 服務時，才從 DI 容器取得物件實例
+            services.AddMvc();
+            // 註冊 interface & 實作，也可在 Program 中註冊，但不可重複註冊
+            services.AddTransient<ISampleTransient, SampleService>();
+            services.AddScoped<ISampleScoped, SampleService>();
+            services.AddSingleton<ISampleSingleton, SampleService>();
+
+            // Singleton 也可以用以下方法註冊
+            // services.AddSingleton<ISampleSingleton>(new SampleService());
+
+            // 也可以透過委派的方式註冊
+            // services.AddTransient<ISampleTransient>(srv => {
+            //                                             var sampleService = new SampleService();
+            //                                             // Do something ...
+            //                                             return sampleService;
+            //                                         });
+            // services.AddScoped<ISampleScoped>(srv => new SampleService());
+            // services.AddSingleton<ISampleSingleton>(srv => new SampleService());
+            #endregion
+
         }
 
         // Host 啟動後 WebHost 會呼叫 UseStartup 泛型類別的 Configure 方法
