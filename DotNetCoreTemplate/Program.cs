@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using DotNetCoreTemplate.Service;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using DotNetCoreTemplate.Service;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DotNetCoreTemplate
 {
@@ -19,6 +19,20 @@ namespace DotNetCoreTemplate
             Output("[Program] Build Host");
             // 實例化 Host & WebHost
             var host = hostBuilder.Build();
+
+            #region 在 Main 中取得 DI 註冊的 Service
+
+            // Singleton & Transient 可直接透過 Service Provider 取出
+            var singleton = host.Services.GetService<ISampleSingleton>();
+            var transient = host.Services.GetService<ISampleTransient>();
+
+            // Scoped 必須先建立 Service Scope，才可以在 Scope 內的 Service Provider 中取出
+            using (var scope = host.Services.CreateScope())
+            {
+                var scoped = scope.ServiceProvider.GetService<ISampleScoped>();
+            }
+
+            #endregion
 
             Output("[Program] Run Host");
             // 啟動 Host
