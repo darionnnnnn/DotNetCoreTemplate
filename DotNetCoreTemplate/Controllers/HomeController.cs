@@ -19,16 +19,21 @@ namespace DotNetCoreTemplate.Controllers
         private ISampleService _transientService { get; }
         private ISampleService _scopedService { get; }
         private ISampleService _singletonService { get; }
+        public IEnumerable<IPayService> _PayServices { get; }
 
         public HomeController(ILogger<HomeController> logger,
                               ISampleTransient transientService,
                               ISampleScoped scopedService,
-                              ISampleSingleton singletonService)
+                              ISampleSingleton singletonService,
+                              IEnumerable<IPayService> payServices)
         {
             _logger = logger;
             _transientService = transientService;
             _scopedService = scopedService;
             _singletonService = singletonService;
+
+            // One interface with multiple service.
+            _PayServices = payServices;
         }
 
         // 局部註冊 Middleware
@@ -43,7 +48,7 @@ namespace DotNetCoreTemplate.Controllers
             return View();
         }
 
-        public IActionResult PrintSomething()
+        public IActionResult PrintDILifetimeScope()
         {
             ViewBag.Transient = _transientService.GetSomething();
             ViewBag.TransientHashCode = _transientService.GetHashCode();
@@ -55,6 +60,16 @@ namespace DotNetCoreTemplate.Controllers
             ViewBag.SingletonHashCode = _singletonService.GetHashCode();
 
             return View();
+        }
+
+        public IActionResult MultipleDI(PayType payType)
+        {
+            // get needed payService.
+            var payService = _PayServices.Single(x => x.PayType == PayType.CashOnDelivery);
+
+            payService.Deduction(100);
+
+            return Ok();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -42,6 +42,15 @@ namespace DotNetCoreTemplate
             services.AddScoped<ISampleScoped, SampleService>();
             services.AddSingleton<ISampleSingleton, SampleService>();
 
+            #region 同一 interface 註冊多個 service
+
+            // 建議只在 Singleton 使用，Transient & Scoped 注入時會 new 新的實例，沒用到就變成不必要的效能耗損
+            services.AddSingleton<IPayService, CashOnDeliveryService>();
+            services.AddSingleton<IPayService, CreditCardService>();
+            services.AddSingleton<IPayService, WhateverPayService>();
+
+            #endregion
+
             #region 在 Host 實例產生前取得 Service Provider
 
             // 在 Host 實例產生後即可透過 Constructor 注入取得 Service
