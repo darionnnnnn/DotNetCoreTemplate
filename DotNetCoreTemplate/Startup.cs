@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetCoreTemplate.Middleware;
@@ -36,7 +37,26 @@ namespace DotNetCoreTemplate
             #region DI (Dependency Injection) 
 
             // services 就是一個 DI 容器，把 MVC 的服務註冊到 DI 容器，需要用 MVC 服務時，才從 DI 容器取得物件實例
-            services.AddMvc();
+            // services.AddMvc();
+
+            #region Set Json
+
+            // MSDN https://docs.microsoft.com/zh-tw/dotnet/api/system.text.json.jsonserializeroptions?view=net-5.0#properties
+            services.AddMvc()
+                    .AddJsonOptions(option =>
+                                    {
+
+                                        // 把 JSON 格式排版美化，預設 false，通常 Production 版本不會做這個設定
+                                        option.JsonSerializerOptions.WriteIndented = true;
+                                        // 自訂序列反序列化的命名規則 (use Camel Case)
+                                        option.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                                        // 忽略 null 值的屬性，預設 false
+                                        // 轉型過程找不到欄位會自動轉成 null，傳送過程忽略掉反而可以節省一點流量
+                                        option.JsonSerializerOptions.IgnoreNullValues = true;
+                                    });
+
+            #endregion
+
             // 註冊 interface & 實作，也可在 Program 中註冊，但不可重複註冊
             services.AddTransient<ISampleTransient, SampleService>();
             services.AddScoped<ISampleScoped, SampleService>();
@@ -174,7 +194,6 @@ namespace DotNetCoreTemplate
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-
 
 
             // For trigger stop WebHost
