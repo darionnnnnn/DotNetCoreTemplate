@@ -45,11 +45,15 @@ namespace DotNetCoreTemplate
             // 也可在 Controller or Action 上以 Attribute 方式局部註冊 Filter
             services.AddMvc(config =>
                             {
+                                // 一般註冊
                                 // config.Filters.Add(new ActionFilter());
                                 // config.Filters.Add(new AuthorizationFilter());
                                 // config.Filters.Add(new ResultFilter());
                                 // config.Filters.Add(new ExceptionFilter());
                                 // config.Filters.Add(new ResourceFilter());
+
+                                // 調整執行順序註冊
+                                config.Filters.Add(new ActionFilter { Name = "Global", Order = 3 });
                             })
 
             #endregion

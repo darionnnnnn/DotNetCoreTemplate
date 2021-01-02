@@ -17,6 +17,8 @@ namespace DotNetCoreTemplate.Controllers
     // [MiddlewareFilter(typeof(FirstMiddleware))]
     // 局部註冊 Filter
     // [TypeFilter(typeof(AuthorizationFilter))] // 繼承 Attribute 後可改寫成 [AuthorizationFilter]
+    // 自訂 ActionFilter 執行順序
+    // [ActionFilter(Name = "Controller", Order = 2)]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -49,6 +51,8 @@ namespace DotNetCoreTemplate.Controllers
 
         // 局部註冊 Filter
         // [TypeFilter(typeof(ActionFilter))] // 繼承 Attribute 後可改寫成 [ActionFilter]
+        // 自訂 ActionFilter 執行順序
+        // [ActionFilter(Name = "Action", Order = 1)]
         public void PrintFilter()
         {
             Response.WriteAsync("Hello World! \r\n");
