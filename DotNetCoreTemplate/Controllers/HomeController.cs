@@ -6,13 +6,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using DotNetCoreTemplate.Filter;
 using DotNetCoreTemplate.Middleware;
 using DotNetCoreTemplate.Service;
+using Microsoft.AspNetCore.Http;
 
 namespace DotNetCoreTemplate.Controllers
 {
     // 局部註冊 Middleware
     // [MiddlewareFilter(typeof(FirstMiddleware))]
+    // 局部註冊 Filter
+    // [TypeFilter(typeof(AuthorizationFilter))] // 繼承 Attribute 後可改寫成 [AuthorizationFilter]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -41,6 +45,20 @@ namespace DotNetCoreTemplate.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        // 局部註冊 Filter
+        // [TypeFilter(typeof(ActionFilter))] // 繼承 Attribute 後可改寫成 [ActionFilter]
+        public void PrintFilter()
+        {
+            Response.WriteAsync("Hello World! \r\n");
+        }
+
+        // 局部註冊 Filter
+        // [TypeFilter(typeof(ActionFilter))] // 繼承 Attribute 後可改寫成 [ActionFilter]
+        public void PrintFilterError()
+        {
+            throw new System.Exception("Error");
         }
 
         public IActionResult Privacy()

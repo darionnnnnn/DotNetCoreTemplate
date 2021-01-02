@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DotNetCoreTemplate.Filter;
 using DotNetCoreTemplate.Middleware;
 using DotNetCoreTemplate.Service;
 using Microsoft.AspNetCore.Http;
@@ -39,10 +40,24 @@ namespace DotNetCoreTemplate
             // services 就是一個 DI 容器，把 MVC 的服務註冊到 DI 容器，需要用 MVC 服務時，才從 DI 容器取得物件實例
             // services.AddMvc();
 
-            #region Set Json
+            #region 全域註冊 Filter
 
-            // MSDN https://docs.microsoft.com/zh-tw/dotnet/api/system.text.json.jsonserializeroptions?view=net-5.0#properties
-            services.AddMvc()
+            // 也可在 Controller or Action 上以 Attribute 方式局部註冊 Filter
+            services.AddMvc(config =>
+                            {
+                                // config.Filters.Add(new ActionFilter());
+                                // config.Filters.Add(new AuthorizationFilter());
+                                // config.Filters.Add(new ResultFilter());
+                                // config.Filters.Add(new ExceptionFilter());
+                                // config.Filters.Add(new ResourceFilter());
+                            })
+
+            #endregion
+
+
+            #region Set Json
+            // services.AddMvc()
+                    // MSDN https://docs.microsoft.com/zh-tw/dotnet/api/system.text.json.jsonserializeroptions?view=net-5.0#properties
                     .AddJsonOptions(option =>
                                     {
 
